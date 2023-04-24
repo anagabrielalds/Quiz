@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Quizzes.API.Domain.DTO;
+using Quizzes.API.Domain.Entity;
 using Quizzes.API.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Quizzes.API.Controllers
 {
@@ -57,8 +59,14 @@ namespace Quizzes.API.Controllers
 
         [HttpPost]
         // FromBody para indicar de o corpo da requisição deve ser mapeado para o modelo
-        public IActionResult Post([FromBody] TemaRequest postModel)
+        public IActionResult Post(string tema, IFormFile imagem)
         {
+            var postModel = new TemaRequest
+            {
+                TemaDescription = tema,
+                Imagem = imagem
+            };
+
             //Validação modelo de entrada
             if (ModelState.IsValid)
             {
@@ -77,8 +85,14 @@ namespace Quizzes.API.Controllers
 
         [HttpPut("{id}")]
         // FromBody para indicar de o corpo da requisição deve ser mapeado para o modelo
-        public IActionResult Put(int id, [FromBody] TemaRequest putModel)
+        public IActionResult Put(int id, string tema, IFormFile imagem)
         {
+            var putModel = new TemaRequest()
+            {
+                Imagem = imagem,
+                TemaDescription = tema,
+            };
+
             //Validação modelo de entrada
             if (ModelState.IsValid)
             {

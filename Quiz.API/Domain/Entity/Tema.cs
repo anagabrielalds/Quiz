@@ -13,6 +13,8 @@ namespace Quizzes.API.Domain.Entity
         [StringLength(255)]
         public string TemaDescription { get; set; }
 
+        public byte[] Imagem { get; set; }
+
         public virtual ICollection<Quiz> Quiz { get; set; }
     }
 }

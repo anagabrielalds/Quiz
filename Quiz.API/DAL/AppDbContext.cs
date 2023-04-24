@@ -22,6 +22,7 @@ namespace Quizzes.API.DAL
         {
             modelBuilder.Entity<Tema>(entity => {
                 entity.Property(x => x.TemaDescription).IsUnicode(false).IsRequired();
+                entity.Property(x => x.Imagem).IsUnicode(false).IsRequired();
             });
 
             modelBuilder.Entity<Respostas>(entity => {

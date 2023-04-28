@@ -18,16 +18,16 @@ namespace Quizzes.API.Domain.DTO
 
         public string TemaDescription { get; set; }
 
-        public FileContentResult Imagem { get; set; }
+        public string Imagem { get; set; }
 
-        public FileContentResult getFile(byte[]? bytes)
+        public string getFile(byte[]? bytes)
         {
-            if(bytes.Length > 0)
-            {
-                return new FileContentResult(bytes, "application/octet-stream");
-            }
-            return null;
-            
+            //if(bytes.Length > 0)
+            //{
+            //    return new FileContentResult(bytes, "application/octet-stream");
+            //}
+            //return null;
+            return String.Format("data:image/png;base64,{0}", Convert.ToBase64String(bytes));
         }
     }
 }

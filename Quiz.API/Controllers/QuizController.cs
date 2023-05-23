@@ -40,7 +40,7 @@ namespace Quizzes.API.Controllers
             return quizService.PesquisarPorIdTema(idTema);
         }
 
-        [HttpGet("nome/{nomeParam}")]
+        [HttpGet("Nome/{nomeParam}")]
         public IActionResult GetByNome(string nomeParam) // nome do parametro deve ser o mesmo do {}
         {
             var retorno = quizService.PesquisarPorNome(nomeParam);

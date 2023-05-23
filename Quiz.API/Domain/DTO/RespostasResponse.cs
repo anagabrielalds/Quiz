@@ -7,14 +7,14 @@ namespace Quizzes.API.Domain.DTO
     {
         public RespostasResponse(Respostas resposta)
         {
-            Id = resposta.Id;   
-            IdQuiz = resposta.IdQuiz;
+            Id = resposta.Id;
+            IdPergunta = resposta.IdPergunta;
             Descricao = resposta.Descricao;
             EhCorreta = resposta.EhCorreta;
         }
         public int Id { get; set; }
 
-        public int IdQuiz { get; set; }
+        public int IdPergunta { get; set; }
 
         public string Descricao { get; set; }
 

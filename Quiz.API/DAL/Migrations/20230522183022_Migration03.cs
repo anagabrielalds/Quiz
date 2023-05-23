@@ -5,14 +5,11 @@
 namespace Quizzes.API.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class Migration01 : Migration
+    public partial class Migration03 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropIndex(
-                name: "IX_Quiz_IdTema",
-                table: "Quiz");
 
         }
 

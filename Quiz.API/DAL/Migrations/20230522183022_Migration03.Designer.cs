@@ -11,8 +11,8 @@ using Quizzes.API.DAL;
 namespace Quizzes.API.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230421231118_Migration01")]
-    partial class Migration01
+    [Migration("20230522183022_Migration03")]
+    partial class Migration03
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,29 @@ namespace Quizzes.API.DAL.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Quizzes.API.Domain.Entity.Perguntas", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("IdQuiz")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Pergunta")
+                        .IsRequired()
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdQuiz");
+
+                    b.ToTable("Perguntas");
+                });
+
             modelBuilder.Entity("Quizzes.API.Domain.Entity.Quiz", b =>
                 {
                     b.Property<int>("Id")
@@ -33,10 +56,9 @@ namespace Quizzes.API.DAL.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("IdTema")
-                        .IsUnicode(false)
                         .HasColumnType("int");
 
-                    b.Property<string>("Pergunta")
+                    b.Property<string>("Titulo")
                         .IsRequired()
                         .HasMaxLength(255)
                         .IsUnicode(false)
@@ -44,8 +66,7 @@ namespace Quizzes.API.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdTema")
-                        .IsUnique();
+                    b.HasIndex("IdTema");
 
                     b.ToTable("Quiz");
                 });
@@ -68,13 +89,12 @@ namespace Quizzes.API.DAL.Migrations
                         .IsUnicode(false)
                         .HasColumnType("bit");
 
-                    b.Property<int>("IdQuiz")
-                        .IsUnicode(false)
+                    b.Property<int>("IdPergunta")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdQuiz");
+                    b.HasIndex("IdPergunta");
 
                     b.ToTable("Respostas");
                 });
@@ -87,6 +107,11 @@ namespace Quizzes.API.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<byte[]>("Imagem")
+                        .IsRequired()
+                        .IsUnicode(false)
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<string>("TemaDescription")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -98,21 +123,10 @@ namespace Quizzes.API.DAL.Migrations
                     b.ToTable("Tema");
                 });
 
-            modelBuilder.Entity("Quizzes.API.Domain.Entity.Quiz", b =>
-                {
-                    b.HasOne("Quizzes.API.Domain.Entity.Tema", "Tema")
-                        .WithOne("Quiz")
-                        .HasForeignKey("Quizzes.API.Domain.Entity.Quiz", "IdTema")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Tema");
-                });
-
-            modelBuilder.Entity("Quizzes.API.Domain.Entity.Respostas", b =>
+            modelBuilder.Entity("Quizzes.API.Domain.Entity.Perguntas", b =>
                 {
                     b.HasOne("Quizzes.API.Domain.Entity.Quiz", "Quiz")
-                        .WithMany("Respostas")
+                        .WithMany("Perguntas")
                         .HasForeignKey("IdQuiz")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -122,13 +136,39 @@ namespace Quizzes.API.DAL.Migrations
 
             modelBuilder.Entity("Quizzes.API.Domain.Entity.Quiz", b =>
                 {
+                    b.HasOne("Quizzes.API.Domain.Entity.Tema", "Tema")
+                        .WithMany("Quiz")
+                        .HasForeignKey("IdTema")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Tema");
+                });
+
+            modelBuilder.Entity("Quizzes.API.Domain.Entity.Respostas", b =>
+                {
+                    b.HasOne("Quizzes.API.Domain.Entity.Perguntas", "Perguntas")
+                        .WithMany("Respostas")
+                        .HasForeignKey("IdPergunta")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Perguntas");
+                });
+
+            modelBuilder.Entity("Quizzes.API.Domain.Entity.Perguntas", b =>
+                {
                     b.Navigation("Respostas");
+                });
+
+            modelBuilder.Entity("Quizzes.API.Domain.Entity.Quiz", b =>
+                {
+                    b.Navigation("Perguntas");
                 });
 
             modelBuilder.Entity("Quizzes.API.Domain.Entity.Tema", b =>
                 {
-                    b.Navigation("Quiz")
-                        .IsRequired();
+                    b.Navigation("Quiz");
                 });
 #pragma warning restore 612, 618
         }

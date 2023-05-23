@@ -4,7 +4,7 @@ namespace Quizzes.API.Domain.DTO
 {
     public class RespostasRequest
     {
-        public int IdQuiz { get; set; }
+        public int IdPergunta { get; set; }
 
         public string Descricao { get; set; }
 

@@ -5,7 +5,7 @@
 namespace Quizzes.API.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class Migration00 : Migration
+    public partial class Migration01 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,7 +16,8 @@ namespace Quizzes.API.DAL.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TemaDescription = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: false)
+                    TemaDescription = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: false),
+                    Imagem = table.Column<byte[]>(type: "varbinary(max)", unicode: false, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -29,8 +30,8 @@ namespace Quizzes.API.DAL.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Pergunta = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: false),
-                    IdTema = table.Column<int>(type: "int", unicode: false, nullable: false)
+                    Titulo = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: false),
+                    IdTema = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -39,8 +40,27 @@ namespace Quizzes.API.DAL.Migrations
                         name: "FK_Quiz_Tema_IdTema",
                         column: x => x.IdTema,
                         principalTable: "Tema",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Perguntas",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Pergunta = table.Column<string>(type: "varchar(max)", unicode: false, nullable: false),
+                    IdQuiz = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Perguntas", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Perguntas_Quiz_IdQuiz",
+                        column: x => x.IdQuiz,
+                        principalTable: "Quiz",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -49,31 +69,36 @@ namespace Quizzes.API.DAL.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    IdQuiz = table.Column<int>(type: "int", unicode: false, nullable: false),
+                    IdPergunta = table.Column<int>(type: "int", unicode: false, nullable: false),
                     Descricao = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: false),
-                    EhCorreta = table.Column<bool>(type: "bit", unicode: false, nullable: false)
+                    EhCorreta = table.Column<bool>(type: "bit", unicode: false, nullable: false),
+                    PerguntasId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Respostas", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Respostas_Quiz_IdQuiz",
-                        column: x => x.IdQuiz,
-                        principalTable: "Quiz",
+                        name: "FK_Respostas_Perguntas_PerguntasId",
+                        column: x => x.PerguntasId,
+                        principalTable: "Perguntas",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Quiz_IdTema",
-                table: "Quiz",
-                column: "IdTema",
-                unique: false);
+                name: "IX_Perguntas_IdQuiz",
+                table: "Perguntas",
+                column: "IdQuiz");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Respostas_IdQuiz",
+                name: "IX_Quiz_IdTema",
+                table: "Quiz",
+                column: "IdTema");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Respostas_PerguntasId",
                 table: "Respostas",
-                column: "IdQuiz");
+                column: "PerguntasId");
         }
 
         /// <inheritdoc />
@@ -81,6 +106,9 @@ namespace Quizzes.API.DAL.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Respostas");
+
+            migrationBuilder.DropTable(
+                name: "Perguntas");
 
             migrationBuilder.DropTable(
                 name: "Quiz");

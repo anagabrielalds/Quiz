@@ -9,16 +9,20 @@ namespace Quizzes.API.Domain.DTO
          public QuizResponse(Quiz quiz)
          {
             Id = quiz.Id;
-            Pergunta = quiz.Pergunta;
+            Titulo = quiz.Titulo;
             Tema = quiz.Tema.TemaDescription;
-            Respostas = quiz.Respostas?.Select(x => new RespostaQuizResponse(x)).ToList();
+            IdTema = quiz.IdTema;
+            Questions = quiz?.Perguntas?.Select(x => new PerguntasQuizResponse(x)).ToList();
          }
 
         public int Id { get; set; }
 
-        public string Pergunta { get; set; }
-
         public string Tema { get; set; }
-        public ICollection<RespostaQuizResponse> Respostas { get; set; }
+
+        public int IdTema { get; set; }
+
+        public string Titulo { get; set; }
+        public List<PerguntasQuizResponse>? Questions { get; set; }
+
     }
 }

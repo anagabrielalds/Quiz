@@ -18,14 +18,14 @@ namespace Quizzes.API.Services
         public ServiceResponse<Respostas> CadastrarNovo(RespostasRequest model)
         {
 
-            if (string.IsNullOrEmpty(model.IdQuiz.ToString()))
+            if (string.IsNullOrEmpty(model.IdPergunta.ToString()))
             {
-                return new ServiceResponse<Respostas>("O IdQuiz é obrigatório");
+                return new ServiceResponse<Respostas>("O IdPergunta é obrigatório");
             }
 
             var novaResposta = new Respostas()
             {
-                IdQuiz = model.IdQuiz,
+                IdPergunta = model.IdPergunta,
                 Descricao = model.Descricao,
                 EhCorreta = model.EhCorreta,
             };
@@ -56,9 +56,9 @@ namespace Quizzes.API.Services
                 return new ServiceResponse<RespostasResponse>(new RespostasResponse(resultado));
 
         }
-        public ServiceResponse<RespostasResponse> PesquisarPorIdQuiz(int idQuiz)
+        public ServiceResponse<RespostasResponse> PesquisarPorIdPergunta(int idPergunta)
         {
-            var resultado = _dbContext.Respostas.FirstOrDefault(x => x.IdQuiz == idQuiz);
+            var resultado = _dbContext.Respostas.FirstOrDefault(x => x.IdPergunta == idPergunta);
             if (resultado == null)
                 return new ServiceResponse<RespostasResponse>("Não encontrado!");
             else

@@ -116,7 +116,7 @@ namespace Quizzes.API.Services
                 }
                 resultado.Imagem = GetBytesImagem(model.Imagem);
             }
-            if (string.IsNullOrWhiteSpace(model.TemaDescription))
+            if (!string.IsNullOrWhiteSpace(model.TemaDescription))
                 resultado.TemaDescription = model.TemaDescription;
             else
                 resultado.TemaDescription = resultado.TemaDescription;
@@ -144,9 +144,11 @@ namespace Quizzes.API.Services
         {
             using (var memoryStream = new MemoryStream())
             {
-                 file.CopyToAsync(memoryStream);
+                memoryStream.Flush();
+                memoryStream.Position = 0;
+                file.CopyToAsync(memoryStream);
                  
-                return memoryStream.ToArray();
+                return  memoryStream.ToArray();
             }
         }
     }

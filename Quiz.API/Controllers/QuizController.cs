@@ -26,20 +26,20 @@ namespace Quizzes.API.Controllers
         {
             return quizService.ListarTodos();
         }
-        [HttpGet("{id}")]
-        public IActionResult GetById(int id)
-        {
-            var retorno = quizService.PesquisarPorId(id);
 
-            if (retorno.Sucesso)
-            {
-                return Ok(retorno.ObjetoRetorno);
-            }
-            else
-            {
-                return NotFound(retorno);
-            }
+        [HttpGet("{id}")]
+        public ServiceResponse<QuizResponse> GetById(int id)
+        {
+            return quizService.PesquisarPorId(id);
+
         }
+
+        [HttpGet("Tema/{idTema}")]
+        public ServiceResponse<IEnumerable<QuizResponse>> GetByIdTema(int idTema)
+        {
+            return quizService.PesquisarPorIdTema(idTema);
+        }
+
         [HttpGet("nome/{nomeParam}")]
         public IActionResult GetByNome(string nomeParam) // nome do parametro deve ser o mesmo do {}
         {
@@ -56,7 +56,6 @@ namespace Quizzes.API.Controllers
         }
 
         [HttpPost]
-        // FromBody para indicar de o corpo da requisição deve ser mapeado para o modelo
         public IActionResult Post([FromBody] QuizRequest postModel)
         {
             //Validação modelo de entrada
@@ -75,27 +74,25 @@ namespace Quizzes.API.Controllers
 
         }
 
-        [HttpPut("{id}")]
-        // FromBody para indicar de o corpo da requisição deve ser mapeado para o modelo
-        public IActionResult Put(int id, [FromBody] QuizUpdateRequest putModel)
-        {
-            //Validação modelo de entrada
-            if (ModelState.IsValid)
-            {
-                var retorno = quizService.Editar(id, putModel);
-                if (!retorno.Sucesso)
-                    return BadRequest(retorno.Mensagem);
-                return Ok(retorno.ObjetoRetorno);
-            }
-            else
-            {
-                return BadRequest(ModelState);
-            }
+        //[HttpPut("{id}")]
+        //public IActionResult Put(int id, [FromBody] QuizUpdateRequest putModel)
+        //{
+        //    //Validação modelo de entrada
+        //    if (ModelState.IsValid)
+        //    {
+        //        var retorno = quizService.Editar(id, putModel);
+        //        if (!retorno.Sucesso)
+        //            return BadRequest(retorno.Mensagem);
+        //        return Ok(retorno.ObjetoRetorno);
+        //    }
+        //    else
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
 
-        }
+        //}
 
         [HttpDelete("{id}")]
-        // FromBody para indicar de o corpo da requisição deve ser mapeado para o modelo
         public IActionResult Delete(int id)
         {
             //Validação modelo de entrada

@@ -32,6 +32,7 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 builder.Services.AddTransient<RespostasServices>();
 builder.Services.AddTransient<TemaServices>();
 builder.Services.AddTransient<QuizServices>();
+builder.Services.AddTransient<PerguntasServices>();
 
 string connectionString = "Data Source=INOTE1653\\SQLEXPRESS;Database=Quiz;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));

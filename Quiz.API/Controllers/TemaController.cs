@@ -28,6 +28,7 @@ namespace Quizzes.API.Controllers
         {
             return temaService.ListarTodos();
         }
+
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
@@ -99,7 +100,7 @@ namespace Quizzes.API.Controllers
                 var retorno = temaService.Editar(id, putModel);
                 if (!retorno.Sucesso)
                     return BadRequest(retorno.Mensagem);
-                return Ok(retorno.ObjetoRetorno);
+                return Ok(retorno);
             }
             else
             {

@@ -11,12 +11,13 @@ namespace Quizzes.API.Domain.Entity
 
         [Required]
         [StringLength(255)]
-        public string Pergunta { get; set; }
+        public string Titulo { get; set; }
+
+        public virtual ICollection<Perguntas>? Perguntas { get; set; }
 
         [Required]
         [ForeignKey("Tema")]
         public int IdTema { get; set; }
-        public virtual ICollection<Respostas>? Respostas { get; set; }
        
         public virtual Tema Tema { get; set; }
     }

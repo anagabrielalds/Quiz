@@ -13,11 +13,12 @@ namespace Quizzes.API.Services
     {
         private readonly AppDbContext _dbContext;
         public  RespostasServices _respostas;
-        public QuizServices(AppDbContext dbContext, RespostasServices respostas)
+        public PerguntasServices _perguntas;
+        public QuizServices(AppDbContext dbContext, RespostasServices respostas, PerguntasServices perguntas)
         {
             _dbContext = dbContext;
             _respostas = respostas;
-
+            _perguntas = perguntas;
         }
 
         public ServiceResponse<QuizResponse> CadastrarNovo(QuizRequest model)
@@ -27,37 +28,40 @@ namespace Quizzes.API.Services
             {
                 return new ServiceResponse<QuizResponse>("Tema é obirgatório");
             }
-            if (string.IsNullOrWhiteSpace(model.Pergunta))
+            if (string.IsNullOrEmpty(model.Titulo))
             {
-                return new ServiceResponse<QuizResponse>("Pergunta é obirgatória");
+                return new ServiceResponse<QuizResponse>("Titulo é obirgatória");
             }
-            if (model.Respostas?.Where( r => r.EhCorreta == true).ToList().Count > 1)
-            {
-                return new ServiceResponse<QuizResponse>("Apenas 1 Respostas pode ser verdadeira");
-            }
+            
 
             //tudo certo, só cadastrar
             var novoQuiz= new Quiz()
             {
-                Pergunta = model.Pergunta,
+                Titulo = model.Titulo,
                 IdTema = model.IdTema,
             };
 
             _dbContext.Add(novoQuiz);
             _dbContext.SaveChanges();
 
-            if(model.Respostas?.Count > 0 || model.Respostas != null)
+            if (model.Questions?.Count > 0 || model.Questions != null)
             {
-               foreach(var item in model.Respostas)
+                foreach (var item in model.Questions)
                 {
-                    var novaResposta = new RespostasRequest()
+                    var novaPergunta = new PerguntasRequest()
                     {
                         IdQuiz = novoQuiz.Id,
-                        Descricao = item.Descricao,
-                        EhCorreta = item.EhCorreta,
+                        Pergunta = item.Pergunta,
                     };
-                    
-                    _respostas.CadastrarNovo(novaResposta);
+
+                    var retornoPerguntas = _perguntas.CadastrarNovo(novaPergunta);
+
+                    foreach(var res in item.Respostas)
+                    {
+                        res.IdPergunta = retornoPerguntas.ObjetoRetorno.Id;
+                        _respostas.CadastrarNovo(res);
+
+                    }
 
                 }
             }
@@ -70,8 +74,12 @@ namespace Quizzes.API.Services
 
         public IEnumerable<QuizResponse> ListarTodos()
         {
-            var retornoDoBanco = _dbContext.Quiz.Include(x => x.Tema).Include(x => x.Respostas).ToList();
+            List<Quiz> retornoDoBanco = (List<Quiz>)_dbContext.Quiz.Include(x => x.Tema).Include(x => x.Perguntas)
+                .ThenInclude(p => p.Respostas)
+                .ToList();
+                
 
+ 
             IEnumerable<QuizResponse> lista = retornoDoBanco.Select(x => new QuizResponse(x));
 
             return lista;
@@ -80,43 +88,63 @@ namespace Quizzes.API.Services
 
         public ServiceResponse<QuizResponse> PesquisarPorId(int id)
         {
-            var resultado = _dbContext.Quiz.Include(x => x.Tema).Include(x => x.Respostas).FirstOrDefault(x => x.Id == id);
+            var resultado = _dbContext.Quiz
+                .Include(x => x.Tema)
+                .Include(x => x.Perguntas)
+                .ThenInclude(p => p.Respostas)
+                .FirstOrDefault(x => x.Id == id);
+
             if (resultado == null)
                 return new ServiceResponse<QuizResponse>("Não encontrado!");
             else
-                return new ServiceResponse<QuizResponse>(new  QuizResponse(resultado));
+                return new ServiceResponse<QuizResponse>(new QuizResponse(resultado));
+
+        }
+
+        public ServiceResponse<IEnumerable<QuizResponse>> PesquisarPorIdTema(int idTema)
+        {
+            var resultado = _dbContext.Quiz
+                .Include(x => x.Tema)
+                .Include(x => x.Perguntas)
+                .ThenInclude(p => p.Respostas)
+                .Where(x => x.Tema.Id == idTema)
+                .ToList();
+
+            if (resultado == null)
+                return new ServiceResponse<IEnumerable<QuizResponse>>("Não encontrado!");
+            else return new ServiceResponse<IEnumerable<QuizResponse>>(resultado.Select(x => new QuizResponse(x)));
 
         }
 
         public ServiceResponse<IEnumerable<QuizResponse>> PesquisarPorNome(string nome)
         {
-            var resultado = _dbContext.Quiz
-                            .Include(x => x.Tema)
-                            .Include(x => x.Respostas)
-                            .Where(x => x.Pergunta.Contains(nome))
-                            .ToList();
+            List<Quiz> resultado = _dbContext.Quiz
+                       .Include(x => x.Tema)
+                       .Include(x => x.Perguntas)
+                       .ThenInclude(p => p.Respostas)
+                       .Where(x => x.Titulo.Contains(nome))
+                       .ToList();
 
-            if (resultado == null)
+            if (resultado == null || resultado?.Count == 0)
                 return new ServiceResponse<IEnumerable<QuizResponse>>("Não encontrado!");
-            else
-                return new ServiceResponse<IEnumerable<QuizResponse>>(resultado.Select(x => new QuizResponse(x)));
+            else return new ServiceResponse<IEnumerable<QuizResponse>>(resultado.Select(x => new QuizResponse(x)));
         }
 
-        public ServiceResponse<QuizResponse> Editar(int id, QuizUpdateRequest model)
-        {
-            var resultado = _dbContext.Quiz.FirstOrDefault(x => x.Id == id);
+        //public ServiceResponse<QuizResponse> Editar(int id, QuizUpdateRequest model)
+        //{
+        //    var resultado = _dbContext.Quiz.FirstOrDefault(x => x.Id == id);
 
-            if (resultado == null)
-                return new ServiceResponse<QuizResponse>("Quiz não encontrado!");
+        //    if (resultado == null)
+        //        return new ServiceResponse<QuizResponse>("Quiz não encontrado!");
 
-            resultado.IdTema = model.IdTema;
-            resultado.Pergunta = model.Pergunta;
+        //    resultado.IdTema = model.IdTema;
+        //    resultado.Perguntas = model.Perguntas;
 
-            _dbContext.Quiz.Add(resultado).State = EntityState.Modified;
-            _dbContext.SaveChanges();
+        //    _dbContext.Quiz.Add(resultado).State = EntityState.Modified;
+        //    _dbContext.SaveChanges();
 
-            return new ServiceResponse<QuizResponse>(new QuizResponse(resultado));
-        }
+        //    return new ServiceResponse<QuizResponse>(new QuizResponse(resultado));
+        //}
 
         public ServiceResponse<bool> Deletar(int id)
         {

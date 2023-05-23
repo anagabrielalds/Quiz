@@ -9,13 +9,14 @@ namespace Quizzes.API.Domain.Entity
         [Key]
         public int Id { get; set; }
         [Required]
-        public int IdQuiz { get; set; }
+        public int IdPergunta { get; set; }
         [Required]
         [StringLength(255)]
         public string Descricao { get; set; }
+
         [Required]
         public bool EhCorreta { get; set; }
-        [Required]
-        public virtual Quiz Quiz { get; set; }
+    
+        public virtual Perguntas Perguntas { get; set; }
     }
 }

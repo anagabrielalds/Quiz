@@ -6,10 +6,10 @@ namespace Quizzes.API.Domain.DTO
 {
     public class QuizRequest
     {
-        public string Pergunta { get; set; }
+        public string Titulo { get; set; }
 
         public int IdTema { get; set; }
 
-        public  ICollection<RespostasUpdateRequest>? Respostas { get; set; }
+        public List<PerguntasRequest> Questions { get; set; }
     }
 }

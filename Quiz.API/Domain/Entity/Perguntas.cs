@@ -7,7 +7,7 @@ namespace Quizzes.API.Domain.Entity
     {
         public int Id { get; set; }
 
-        
+
         public string Pergunta { get; set; }
         [Required]
         [ForeignKey("Quiz")]

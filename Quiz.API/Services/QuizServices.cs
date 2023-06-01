@@ -66,9 +66,7 @@ namespace Quizzes.API.Services
                 }
             }
 
-            var resultado = PesquisarPorId(novoQuiz.Id).ObjetoRetorno;
-
-            return new ServiceResponse<QuizResponse>(resultado);
+            return PesquisarPorId(novoQuiz.Id);
 
         }
 
@@ -84,7 +82,6 @@ namespace Quizzes.API.Services
 
             return lista;
         }
-
 
         public ServiceResponse<QuizResponse> PesquisarPorId(int id)
         {
@@ -110,7 +107,7 @@ namespace Quizzes.API.Services
                 .Where(x => x.Tema.Id == idTema)
                 .ToList();
 
-            if (resultado == null)
+            if (resultado == null || resultado.Count == 0)
                 return new ServiceResponse<IEnumerable<QuizResponse>>("Não encontrado!");
             else return new ServiceResponse<IEnumerable<QuizResponse>>(resultado.Select(x => new QuizResponse(x)));
 
@@ -130,21 +127,58 @@ namespace Quizzes.API.Services
             else return new ServiceResponse<IEnumerable<QuizResponse>>(resultado.Select(x => new QuizResponse(x)));
         }
 
-        //public ServiceResponse<QuizResponse> Editar(int id, QuizUpdateRequest model)
-        //{
-        //    var resultado = _dbContext.Quiz.FirstOrDefault(x => x.Id == id);
+        public ServiceResponse<QuizResponse> Editar(int id, QuizUpdateRequest model)
+        {
+            var quiz = _dbContext.Quiz.FirstOrDefault(x => x.Id == id);
 
-        //    if (resultado == null)
-        //        return new ServiceResponse<QuizResponse>("Quiz não encontrado!");
+            if (quiz == null)
+                return new ServiceResponse<QuizResponse>("Quiz não encontrado!");
 
-        //    resultado.IdTema = model.IdTema;
-        //    resultado.Perguntas = model.Perguntas;
+            if (model.IdTema == 0)
+            {
+                return new ServiceResponse<QuizResponse>("Tema é obirgatório");
+            }
+            if (string.IsNullOrEmpty(model.Titulo))
+            {
+                return new ServiceResponse<QuizResponse>("Titulo é obirgatória");
+            }
 
-        //    _dbContext.Quiz.Add(resultado).State = EntityState.Modified;
-        //    _dbContext.SaveChanges();
+            // atualizar informações do quiz idTema, Titulo, Perguntas e as respostas das perguntas
 
-        //    return new ServiceResponse<QuizResponse>(new QuizResponse(resultado));
-        //}
+            quiz.IdTema = model.IdTema;
+            quiz.Titulo = model.Titulo;
+
+            _dbContext.Quiz.Add(quiz).State = EntityState.Modified;
+            _dbContext.SaveChanges();
+
+            //atualizar perguntas
+
+            if (model.Questions != null && model.Questions?.Count > 0 )
+            {
+                foreach (var item in model.Questions)
+                {
+
+                    var retornoPerguntas = _perguntas.Editar(id, item);
+
+                    if(item.Respostas != null && item.Respostas.Count > 0)
+                    {
+                        if (retornoPerguntas.Sucesso)
+                            foreach (var res in item.Respostas)
+                            {
+                                var retornoRespostas = _respostas.Editar(retornoPerguntas.ObjetoRetorno.Id, res);
+                                if (!retornoRespostas.Sucesso)
+                                {
+                                    return new ServiceResponse<QuizResponse>("Não foi possível atualizar todas as Respostas");
+                                }
+                            }
+                        else return new ServiceResponse<QuizResponse>("Não foi possível atualizar todas as Perguntas");
+                    }
+                }
+            }
+
+            return PesquisarPorId(quiz.Id);
+
+        }
 
         public ServiceResponse<bool> Deletar(int id)
         {

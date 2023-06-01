@@ -66,15 +66,18 @@ namespace Quizzes.API.Services
 
         }
 
-        public ServiceResponse<Respostas> Editar(int id, RespostasUpdateRequest model)
+        public ServiceResponse<Respostas> Editar(int idPergunta, RespostasUpdateRequest res)
         {
-            var resultado = _dbContext.Respostas.FirstOrDefault(x => x.Id == id);
+            var resultado = _dbContext.Respostas.FirstOrDefault(x => x.Id == res.Id);
 
             if (resultado == null)
-                return new ServiceResponse<Respostas>("Resposta não encontrada!");
+                return new ServiceResponse<Respostas>("Resposta não encontrada para a pergunta " + resultado?.Perguntas.Pergunta + " !");
+            if (resultado.IdPergunta != idPergunta)
+                return new ServiceResponse<Respostas>("o IdPergunta não pode ser alterado");
 
-            resultado.Descricao = model.Descricao;
-            resultado.EhCorreta = model.EhCorreta;
+
+            resultado.EhCorreta = res.EhCorreta;
+            resultado.Descricao = res.Descricao;
 
             _dbContext.Respostas.Add(resultado).State = EntityState.Modified;
             _dbContext.SaveChanges();
@@ -94,6 +97,5 @@ namespace Quizzes.API.Services
 
             return new ServiceResponse<bool>(true);
         }
-
     }
 }

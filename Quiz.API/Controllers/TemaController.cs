@@ -43,10 +43,10 @@ namespace Quizzes.API.Controllers
                 return NotFound(retorno);
             }
         }
-        [HttpGet("nome/{nomeParam}")]
-        public IActionResult GetByNome(string nomeParam) // nome do parametro deve ser o mesmo do {}
+        [HttpGet("SearchTema/{temaDescription}")]
+        public IActionResult GetByNome(string temaDescription) // nome do parametro deve ser o mesmo do {}
         {
-            var retorno = temaService.PesquisarPorNome(nomeParam);
+            var retorno = temaService.PesquisarPorNome(temaDescription);
 
             if (retorno.Sucesso)
             {

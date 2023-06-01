@@ -34,16 +34,16 @@ namespace Quizzes.API.Controllers
 
         }
 
-        [HttpGet("Tema/{idTema}")]
+        [HttpGet("TemaId/{idTema}")]
         public ServiceResponse<IEnumerable<QuizResponse>> GetByIdTema(int idTema)
         {
             return quizService.PesquisarPorIdTema(idTema);
         }
 
-        [HttpGet("Nome/{nomeParam}")]
-        public IActionResult GetByNome(string nomeParam) // nome do parametro deve ser o mesmo do {}
+        [HttpGet("SearchQuiz/{titulo}")]
+        public IActionResult GetByNome(string titulo) // nome do parametro deve ser o mesmo do {}
         {
-            var retorno = quizService.PesquisarPorNome(nomeParam);
+            var retorno = quizService.PesquisarPorNome(titulo);
 
             if (retorno.Sucesso)
             {
@@ -74,23 +74,22 @@ namespace Quizzes.API.Controllers
 
         }
 
-        //[HttpPut("{id}")]
-        //public IActionResult Put(int id, [FromBody] QuizUpdateRequest putModel)
-        //{
-        //    //Validação modelo de entrada
-        //    if (ModelState.IsValid)
-        //    {
-        //        var retorno = quizService.Editar(id, putModel);
-        //        if (!retorno.Sucesso)
-        //            return BadRequest(retorno.Mensagem);
-        //        return Ok(retorno.ObjetoRetorno);
-        //    }
-        //    else
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
+        [HttpPut("{id}")]
+        public IActionResult Put(int id, [FromBody] QuizUpdateRequest putModel)
+        {
+            if (ModelState.IsValid)
+            {
+                var retorno = quizService.Editar(id, putModel);
+                if (!retorno.Sucesso)
+                    return BadRequest(retorno.Mensagem);
+                return Ok(retorno.ObjetoRetorno);
+            }
+            else
+            {
+                return BadRequest(ModelState);
+            }
 
-        //}
+        }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)

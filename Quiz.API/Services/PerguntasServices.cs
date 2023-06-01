@@ -41,6 +41,30 @@ namespace Quizzes.API.Services
             return new ServiceResponse<Perguntas>(novaPergunta);
         }
 
+        public ServiceResponse<Perguntas> Editar(int idQuiz , PerguntasUpdateRequest model)
+        {
+            var resultado = _dbContext.Perguntas.FirstOrDefault(x => x.Id == model.Id);
 
+            if (resultado == null)
+                return new ServiceResponse<Perguntas>("Pergunta não encontrada!");
+
+            if (string.IsNullOrEmpty(model.Pergunta))
+            {
+                return new ServiceResponse<Perguntas>("A Pergunta é obrigatório");
+            }
+            if (model.Id != idQuiz)
+            {
+                return new ServiceResponse<Perguntas>("O idQuiz não pode ser alterado");
+            }
+
+            resultado.IdQuiz = idQuiz;
+            resultado.Pergunta = model.Pergunta;
+
+            _dbContext.Perguntas.Add(resultado).State = EntityState.Modified;
+            _dbContext.SaveChanges();
+
+            return new ServiceResponse<Perguntas>(resultado);
+
+        }
     }
 }
